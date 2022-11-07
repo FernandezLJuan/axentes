@@ -6,32 +6,84 @@ mapa_objetivos=[[0,0,0,0,0,0,0,0],
 				[0,0,1,1,1,1,0,0],
 				[0,0,0,0,1,1,0,0],
 				[0,1,1,1,1,1,1,0],
-				[0,1,2,1,1,1,1,0],
+				[0,2,1,1,1,1,1,0],
 				[0,1,1,1,0,0,0,0],
 				[0,0,0,1,1,1,0,0],
 				[0,0,0,1,1,1,0,0],
 				[0,0,0,0,0,0,0,0]]
+'''
+mapa_objetivos=[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
+				[0,0,0,0,0,0,1,1,3,1,1,0,0,0,0,0,0],
+				[0,0,0,0,0,0,1,3,1,3,1,0,0,0,0,0,0],
+				[0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
+				[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+				[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+				[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+				[0,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,0],
+				[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+				[0,1,1,2,1,1,1,1,1,1,1,1,1,2,1,1,0],
+				[0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],]'''
 
+pos_entrega=[]
+
+for i in range(0,len(mapa_objetivos)):
+	for j in range(0,len(mapa_objetivos[0])):
+		if mapa_objetivos[i][j]==3:
+
+			pos_entrega.append([i,j])
 
 class Nodo(object):
 	
 	def __init__(self,pai,mapa,pos):
 	
 		self.pos=pos
-		self.h=0
+		self.f=0
+		self.g=0
 		self.pai=pai
 		self.fillo=None
 		self.mapa=mapa
 		
-	def addNodo(self,mapa,pos):
+	def addNodo(self,mapa,pos,g):
 		
 		novo_nodo=Nodo(self,mapa,pos)
 
 		if mapa_objetivos[novo_nodo.pos[0]][novo_nodo.pos[1]]==2:
 
 			novo_nodo.pos[3]=True
+			novo_nodo.mapa[novo_nodo.pos[0]][novo_nodo.pos[1]]=1
+		
+		if mapa_objetivos[novo_nodo.pos[0]][novo_nodo.pos[1]]==4:
 
-		abierta.append(novo_nodo)
+			novo_nodo.pos[3]=False
+
+		distancia=[]
+		for p in pos_entrega:
+			distancia.append(abs((p[0]-novo_nodo.pos[0]))+abs((p[1]-novo_nodo.pos[1])))
+
+		novo_nodo.g=novo_nodo.pai.g+g
+		novo_nodo.f=novo_nodo.g+min(distancia)
+		print(novo_nodo.f)
+
+		if abierta == []:
+
+			abierta.append(novo_nodo)
+
+		else:
+			
+			for i in range(len(abierta)):
+
+				if abierta[i].f>novo_nodo.f:
+
+					abierta.insert(i,novo_nodo)
+					break
+
+				if i==len(abierta)-1:
+
+					abierta.append(novo_nodo)
 
 		return novo_nodo
 
@@ -47,15 +99,20 @@ class Nodo(object):
 
 	def run(self):
 
+
 		exito=False
-		
+
 		while not exito and len(abierta)!=0:
 
 			actual=self.comprobar(abierta.pop(0))
-			#print("Actual {}".format(actual.pos))
 
-			if actual.pos==[1,5,0,True]:
+			if actual.mapa[pos_entrega[0][0]][pos_entrega[0][1]]==4: #and actual.mapa[pos_entrega[1][0]][pos_entrega[1][1]]==4 and actual.mapa[3][9]==4:
+				for a in mapa_objetivos:
+					print(a)
 				exito=True
+
+			if actual.pos==[pos_entrega[0][0],pos_entrega[0][1],0,True]: #or actual.pos==[pos_entrega[1][0],pos_entrega[1][1],0,True] or actual.pos==[pos_entrega[2][0],pos_entrega[2][1],0,True]:
+				actual.mapa[actual.pos[0]][actual.pos[1]]=4
 
 			else:
 
@@ -63,9 +120,11 @@ class Nodo(object):
 				self.girar_izquierda(actual)
 				self.girar_derecha(actual)
 				cerrada.append(actual)
+
+				#input('Pruebas')
 		
 		print("Terminamos pibe")
-
+		print(actual.g)
 
 	def mover(self,actual):
 
@@ -92,11 +151,13 @@ class Nodo(object):
 
 			if actual.pos[3]:
 
-				print("Posicion actual: {}".format(actual.pos))
+				#print("Posicion actual: {}".format(actual.pos))
 				nuevo_mapa[pos_temp[0]][pos_temp[1]]=2
 				nuevo_mapa[actual.pos[0]][actual.pos[1]]=2
 
-			actual.addNodo(nuevo_mapa,pos_temp)
+			#print("Posicion actual: {}".format(pos_temp))
+
+			actual.addNodo(nuevo_mapa,pos_temp,1)
 
 	def girar_izquierda(self,actual):
 
@@ -118,7 +179,9 @@ class Nodo(object):
 
 			pos_temp[2]=0
 
-		actual.addNodo(mapa_objetivos,pos_temp)
+		#print("Posicion actual: {}".format(pos_temp))
+
+		actual.addNodo(mapa_objetivos,pos_temp,3)
 
 	def girar_derecha(self,actual):
 
@@ -139,10 +202,10 @@ class Nodo(object):
 		elif pos_temp[2]==-1:
 
 			pos_temp[2]=0
-		#print(pos_temp)
 
-		actual.addNodo(mapa_objetivos,pos_temp)
-#		input("ñakjsdñ")
+		#print("Posicion actual: {}".format(pos_temp))
+
+		actual.addNodo(mapa_objetivos,pos_temp,3)
 
 root=Nodo(None,mapa_objetivos,[8,4,0,False])
 
