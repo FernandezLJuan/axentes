@@ -134,7 +134,7 @@ class Nodo():
 		pos_temp=actual.pos.copy()
 		nuevo_mapa=actual.mapa.copy()
 
-		if pos_temp[0]==estanterias[0].p0[0] and pos_temp[1]==estanterias[0].p0[1] and not estanterias[0].destino():
+		if pos_temp[0]==estanterias[0].p0[0] and pos_temp[1]==estanterias[0].p0[1] and not estanterias[0].destino() and not actual.pos[3]:
 			pos_temp[3]=True
 
 			actual.addNodo(nuevo_mapa,pos_temp,1)
