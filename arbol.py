@@ -2,12 +2,14 @@ global cerrada
 global abierta
 from math import sin,cos,pi
 
+#clase estantería, con atributos de posiciones iniciales y finales
+
 mapa_objetivos=[[0,0,0,0,0,0,0,0],
-				[0,0,1,1,3,1,0,0],
+				[0,0,1,1,1,1,0,0],
 				[0,0,1,1,1,1,0,0],
 				[0,0,0,0,1,1,0,0],
 				[0,1,1,1,1,1,1,0],
-				[0,2,1,1,1,1,1,0],
+				[0,1,1,1,1,1,1,0],
 				[0,1,1,1,0,0,0,0],
 				[0,0,0,1,1,1,0,0],
 				[0,0,0,1,1,1,0,0],
@@ -28,16 +30,18 @@ mapa_objetivos=[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 				[0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],
 				[0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],
 				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],]'''
+class Estanteria():
 
-pos_entrega=[]
+	def __init__(self,p0,pf):
 
-for i in range(0,len(mapa_objetivos)):
-	for j in range(0,len(mapa_objetivos[0])):
-		if mapa_objetivos[i][j]==3:
+		self.p0=p0
+		self.pf=pf
 
-			pos_entrega.append([i,j])
+	def actualizar_pos(self,pNuevo):
+		
+		self.p0=pNuevo
 
-class Nodo(object):
+class Nodo():
 	
 	def __init__(self,pai,mapa,pos):
 	
@@ -141,7 +145,7 @@ class Nodo(object):
 			pos_temp[3]=True
 			actual.addNodo(nuevo_mapa,pos_temp,1)
       
-		if mapa_objetivos[pos_temp[0]][pos_temp[1]]==4 or pos_temp[3]:
+		elif mapa_objetivos[pos_temp[0]][pos_temp[1]]==4 or pos_temp[3]:
 
 			pos_temp[3]=False
 			actual.addNodo(nuevo_mapa,pos_temp,1)
@@ -177,11 +181,11 @@ class Nodo(object):
 					cabe=False
         
 				nuevo_mapa[pos_temp[0]][pos_temp[1]]=2
-				nuevo_mapa[actual.pos[0]][actual.pos[1]]=2
+				nuevo_mapa[actual.pos[0]][actual.pos[1]]=1
     
 			if cabe:
     
-				actual.addNodo(nuevo_mapa,pos_temp,1)
+					actual.addNodo(nuevo_mapa,pos_temp,1)
 
 	def girar_izquierda(self,actual):
 
@@ -231,10 +235,14 @@ class Nodo(object):
 
 		actual.addNodo(mapa_objetivos,pos_temp,3)
 
+
+
 root=Nodo(None,mapa_objetivos,[8,4,0,False])
 
 cerrada=[]
 abierta=[root]
+
+estanterias=[Estanteria([5,2,0],[1,4,0])]
 
 root.run()
 
