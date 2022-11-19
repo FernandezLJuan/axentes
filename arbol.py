@@ -130,7 +130,7 @@ class Nodo():
 
 			actual=self.comprobar(abierta.pop(0))
 
-			tmp = [Estanteria(actual.estante[0].p0,[2,4,0])]
+			tmp = [Estanteria(actual.estante[0].p0,actual.estante[0].pf)]
 
 			if tmp[0].destino():
 				
@@ -140,11 +140,11 @@ class Nodo():
 
 				#print('Actual:',actual.pos)
 
-				self.elevador_subir(actual,[Estanteria(actual.estante[0].p0,[2,4,0])])
-				self.elevador_bajar(actual,[Estanteria(actual.estante[0].p0,[2,4,0])])
-				self.mover(actual,[Estanteria(actual.estante[0].p0,[2,4,0])])
-				self.girar_izquierda(actual,[Estanteria(actual.estante[0].p0,[2,4,0])])
-				self.girar_derecha(actual,[Estanteria(actual.estante[0].p0,[2,4,0])])
+				self.elevador_subir(actual,[Estanteria(actual.estante[0].p0,actual.estante[0].pf)])
+				self.elevador_bajar(actual,[Estanteria(actual.estante[0].p0,actual.estante[0].pf)])
+				self.mover(actual,[Estanteria(actual.estante[0].p0,actual.estante[0].pf)])
+				self.girar_izquierda(actual,[Estanteria(actual.estante[0].p0,actual.estante[0].pf)])
+				self.girar_derecha(actual,[Estanteria(actual.estante[0].p0,actual.estante[0].pf)])
 
 				cerrada.append(actual)
 
@@ -277,7 +277,7 @@ class Nodo():
 
 		actual.addNodo(mapa_objetivos,pos_temp,3,tmp)
 
-root=Nodo(None,mapa_objetivos,[8,4,0,False],[Estanteria([5,2,0],[2,4,0])])
+root=Nodo(None,mapa_objetivos,[8,4,0,False],[Estanteria([5,2,0],[3,4,0])])
 
 cerrada=[]
 abierta=[root]
