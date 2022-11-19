@@ -29,7 +29,8 @@ mapa_objetivos=[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 				[0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],
 				[0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],
 				[0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],
-				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],]'''
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]'''
+				
 class Estanteria():
 
 	def __init__(self,p0,pf):
@@ -41,8 +42,7 @@ class Estanteria():
 
 	def actualizar_pos(self,pNuevo):
 
-		print('pNuevo')
-		print(pNuevo)
+		#print('pNuevo:',pNuevo)
 
 		pizq = self.pizq
 		pder = self.pder
@@ -50,18 +50,18 @@ class Estanteria():
 		self.pizq = [pNuevo[0] + int(cos(pNuevo[2]*(pi/2))),pNuevo[1] + int(sin(pNuevo[2]*(pi/2))), pNuevo[2]]
 		self.pder = [pNuevo[0] - int(cos(pNuevo[2]*(pi/2))),pNuevo[1] - int(sin(pNuevo[2]*(pi/2))), pNuevo[2]]
 
-		print('Nuevos lados')
-		print(self.pizq)
-		print(self.pder)
+		#print('Nuevos lados')
+		#print(self.pizq)
+		#print(self.pder)
 
 		if mapa_objetivos[self.pizq[0]][self.pizq[1]]!=0 and mapa_objetivos[self.pder[0]][self.pder[1]]!=0 and mapa_objetivos[pNuevo[0]][pNuevo[1]]!=0:
-			print('Aceptado')
+	
 			self.p0=pNuevo
-			print(self.p0)
+			#print('Aceptado:',self.p0)
 
 		else:
 
-			print('Fallido')
+			#print('Fallido')
 			self.pder= pder
 			self.pizq = pizq
 	
@@ -71,7 +71,7 @@ class Estanteria():
 
 class Nodo():
 	
-	def __init__(self,pai,mapa,pos):
+	def __init__(self,pai,mapa,pos,estante):
 	
 		self.pos=pos
 		self.f=0
@@ -79,13 +79,15 @@ class Nodo():
 		self.pai=pai
 		self.fillo=None
 		self.mapa=mapa
+
+		self.estante = estante
 		
-	def addNodo(self,mapa,pos,g):
+	def addNodo(self,mapa,pos,g,estante):
 		
-		novo_nodo=Nodo(self,mapa,pos)
+		novo_nodo=Nodo(self,mapa,pos,estante)
 
 		distancia=[]
-		for p in estanterias:
+		for p in estante:
 			distancia.append(abs((p.pf[0]-novo_nodo.pos[0]))+abs((p.pf[1]-novo_nodo.pos[1])))
 
 		novo_nodo.g=novo_nodo.pai.g+g
@@ -128,17 +130,21 @@ class Nodo():
 
 			actual=self.comprobar(abierta.pop(0))
 
-			if estanterias[0].destino():
+			tmp = [Estanteria(actual.estante[0].p0,[2,4,0])]
+
+			if tmp[0].destino():
 				
 				exito=True
 
 			else:
 
-				self.elevador_subir(actual)
-				self.elevador_bajar(actual)
-				self.mover(actual)
-				self.girar_izquierda(actual)
-				self.girar_derecha(actual)
+				#print('Actual:',actual.pos)
+
+				self.elevador_subir(actual,[Estanteria(actual.estante[0].p0,[2,4,0])])
+				self.elevador_bajar(actual,[Estanteria(actual.estante[0].p0,[2,4,0])])
+				self.mover(actual,[Estanteria(actual.estante[0].p0,[2,4,0])])
+				self.girar_izquierda(actual,[Estanteria(actual.estante[0].p0,[2,4,0])])
+				self.girar_derecha(actual,[Estanteria(actual.estante[0].p0,[2,4,0])])
 
 				cerrada.append(actual)
 
@@ -146,27 +152,31 @@ class Nodo():
 
 		print("Terminamos pibe")
 		plan=[]
+		#lista=[]
 
 		while actual.pai!=None:
-      
+			
+			#lista.append(actual.estante[0].p0)
 			plan.append(actual.pos)
 			actual=actual.pai
    
 		plan=plan[::-1]
+		#lista=lista[::-1]
   
 		print(plan)
+		#print(lista)
   
-	def elevador_subir(self,actual):
+	def elevador_subir(self,actual,tmp):
      
 		pos_temp=actual.pos.copy()
 		nuevo_mapa=actual.mapa.copy()
 
-		if pos_temp[0]==estanterias[0].p0[0] and pos_temp[1]==estanterias[0].p0[1] and not estanterias[0].destino() and not actual.pos[3]:
+		if pos_temp[0]==tmp[0].p0[0] and pos_temp[1]==tmp[0].p0[1] and not tmp[0].destino() and not actual.pos[3]:
 			pos_temp[3]=True
 
-			actual.addNodo(nuevo_mapa,pos_temp,1)
+			actual.addNodo(nuevo_mapa,pos_temp,1,tmp)
 
-	def elevador_bajar(self,actual):
+	def elevador_bajar(self,actual,tmp):
 
 		pos_temp=actual.pos.copy()
 		nuevo_mapa=actual.mapa.copy()
@@ -174,9 +184,9 @@ class Nodo():
 		if pos_temp[3]:
 
 			pos_temp[3]=False
-			actual.addNodo(nuevo_mapa,pos_temp,1)
+			actual.addNodo(nuevo_mapa,pos_temp,1,tmp)
 
-	def mover(self,actual):
+	def mover(self,actual,tmp):
 
 		pos_temp=actual.pos.copy()
 		nuevo_mapa=actual.mapa.copy()
@@ -201,11 +211,11 @@ class Nodo():
 
 			if actual.pos[3]:
 
-				estanterias[0].actualizar_pos([pos_temp[0],pos_temp[1],estanterias[0].p0[2]])
+				tmp[0].actualizar_pos([pos_temp[0],pos_temp[1],tmp[0].p0[2]])
 			
-			actual.addNodo(nuevo_mapa,pos_temp,1)
+			actual.addNodo(nuevo_mapa,pos_temp,1,tmp)
 
-	def girar_izquierda(self,actual):
+	def girar_izquierda(self,actual,tmp):
 
 		pos_temp=actual.pos.copy()
 
@@ -227,16 +237,16 @@ class Nodo():
 
 		if pos_temp[3]:
 
-			giro = estanterias[0].p0[2]
+			giro = tmp[0].p0[2]
 			giro-=1
 			if giro<-2:
 				giro=1
 
-			estanterias[0].actualizar_pos([estanterias[0].p0[0],estanterias[0].p0[1],giro])
+			tmp[0].actualizar_pos([pos_temp[0],pos_temp[1],giro])
 
-		actual.addNodo(mapa_objetivos,pos_temp,3)
+		actual.addNodo(mapa_objetivos,pos_temp,3,tmp)
 
-	def girar_derecha(self,actual):
+	def girar_derecha(self,actual,tmp):
 
 		pos_temp=actual.pos.copy()
 
@@ -258,21 +268,18 @@ class Nodo():
 
 		if pos_temp[3]:
 
-			giro = estanterias[0].p0[2]
+			giro = tmp[0].p0[2]
 			giro+=1
 			if giro>1:
 				giro=-2
 
-			estanterias[0].actualizar_pos([estanterias[0].p0[0],estanterias[0].p0[1],giro])
+			tmp[0].actualizar_pos([pos_temp[0],pos_temp[1],giro])
 
-		actual.addNodo(mapa_objetivos,pos_temp,3)
+		actual.addNodo(mapa_objetivos,pos_temp,3,tmp)
 
-root=Nodo(None,mapa_objetivos,[8,4,0,False])
+root=Nodo(None,mapa_objetivos,[8,4,0,False],[Estanteria([5,2,0],[2,4,0])])
 
 cerrada=[]
 abierta=[root]
 
-estanterias=[Estanteria([5,2,0],[2,4,0])]
-
 root.run()
-
