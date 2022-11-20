@@ -1,44 +1,81 @@
+
+from math import sin,cos,pi
+import copy
+import sys
+
 global cerrada
 global abierta
 
-mapa_objetivos=[[0,0,0,0,0,0,0,0],
-				[0,0,1,1,1,3,0,0],
-				[0,0,1,1,1,1,0,0],
-				[0,0,0,0,1,1,0,0],
-				[0,1,1,1,1,1,1,0],
-				[0,2,1,1,1,1,1,0],
-				[0,1,1,1,0,0,0,0],
-				[0,0,0,1,1,1,0,0],
-				[0,0,0,1,1,1,0,0],
-				[0,0,0,0,0,0,0,0]]
+#clase estantería, con atributos de posiciones iniciales y finales
+'''
+mapa_objetivos=[[0,0,0,0,0,0,0,0,0],
+				[0,0,1,1,1,1,0,0,0],
+				[0,0,1,1,1,1,0,0,0],
+				[0,0,0,0,1,1,0,0,0],
+				[0,1,1,1,1,1,1,0,0],
+				[0,1,1,1,1,1,1,0,0],
+				[0,1,1,1,0,0,0,0,0],
+				[0,0,0,1,1,1,0,0,0],
+				[0,0,0,1,1,1,0,0,0],
+				[0,0,0,0,0,0,0,0,0]]
 '''
 mapa_objetivos=[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 				[0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
-				[0,0,0,0,0,0,1,1,3,1,1,0,0,0,0,0,0],
-				[0,0,0,0,0,0,1,3,1,3,1,0,0,0,0,0,0],
+				[0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
+				[0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
 				[0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
 				[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
 				[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
 				[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-				[0,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,0],
 				[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-				[0,1,1,2,1,1,1,1,1,1,1,1,1,2,1,1,0],
+				[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+				[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
 				[0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],
 				[0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],
 				[0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],
-				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],]'''
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
+				
+class Estanteria():
 
-pos_entrega=[]
+	def __init__(self,p0,pf):
 
-for i in range(0,len(mapa_objetivos)):
-	for j in range(0,len(mapa_objetivos[0])):
-		if mapa_objetivos[i][j]==3:
+		self.p0=p0
+		self.pizq = [p0[0] + int(cos(self.p0[2]*(pi/2))),p0[1] + int(sin(self.p0[2]*(pi/2))), self.p0[2]]
+		self.pder = [p0[0] - int(cos(self.p0[2]*(pi/2))),p0[1] - int(sin(self.p0[2]*(pi/2))), self.p0[2]]
+		self.pf=pf
 
-			pos_entrega.append([i,j])
+	def actualizar_pos(self,pNuevo):
 
-class Nodo(object):
+		#print('pNuevo:',pNuevo)
+
+		pizq = self.pizq
+		pder = self.pder
+
+		self.pizq = [pNuevo[0] + int(cos(pNuevo[2]*(pi/2))),pNuevo[1] + int(sin(pNuevo[2]*(pi/2))), pNuevo[2]]
+		self.pder = [pNuevo[0] - int(cos(pNuevo[2]*(pi/2))),pNuevo[1] - int(sin(pNuevo[2]*(pi/2))), pNuevo[2]]
+
+		#print('Nuevos lados')
+		#print(self.pizq)
+		#print(self.pder)
+
+		if mapa_objetivos[self.pizq[0]][self.pizq[1]]!=0 and mapa_objetivos[self.pder[0]][self.pder[1]]!=0 and mapa_objetivos[pNuevo[0]][pNuevo[1]]!=0:
 	
-	def __init__(self,pai,mapa,pos):
+			self.p0=pNuevo
+			#print('Aceptado:',self.p0)
+
+		else:
+
+			#print('Fallido')
+			self.pder= pder
+			self.pizq = pizq
+	
+	def destino(self):
+
+		return self.p0==self.pf
+
+class Nodo():
+	
+	def __init__(self,pai,mapa,pos,estante):
 	
 		self.pos=pos
 		self.f=0
@@ -46,27 +83,21 @@ class Nodo(object):
 		self.pai=pai
 		self.fillo=None
 		self.mapa=mapa
+
+		self.estante = estante
 		
-	def addNodo(self,mapa,pos,g):
+	def addNodo(self,mapa,pos,g,estante):
 		
-		novo_nodo=Nodo(self,mapa,pos)
+		novo_nodo=Nodo(self,mapa,pos,estante)
 
-		if mapa_objetivos[novo_nodo.pos[0]][novo_nodo.pos[1]]==2:
+		distancia = 0
 
-			novo_nodo.pos[3]=True
-			novo_nodo.mapa[novo_nodo.pos[0]][novo_nodo.pos[1]]=1
-		
-		if mapa_objetivos[novo_nodo.pos[0]][novo_nodo.pos[1]]==4:
+		for p in estante:
 
-			novo_nodo.pos[3]=False
-
-		distancia=[]
-		for p in pos_entrega:
-			distancia.append(abs((p[0]-novo_nodo.pos[0]))+abs((p[1]-novo_nodo.pos[1])))
+			distancia += abs((p.pf[0]-novo_nodo.pos[0]))+abs((p.pf[1]-novo_nodo.pos[1]))
 
 		novo_nodo.g=novo_nodo.pai.g+g
-		novo_nodo.f=novo_nodo.g+min(distancia)
-		print(novo_nodo.f)
+		novo_nodo.f=novo_nodo.g+distancia
 
 		if abierta == []:
 
@@ -99,37 +130,121 @@ class Nodo(object):
 
 	def run(self):
 
-
 		exito=False
 
 		while not exito and len(abierta)!=0:
 
-			actual=self.comprobar(abierta.pop(0))
+			try:
 
-			if actual.mapa[pos_entrega[0][0]][pos_entrega[0][1]]==4: #and actual.mapa[pos_entrega[1][0]][pos_entrega[1][1]]==4 and actual.mapa[3][9]==4:
-				for a in mapa_objetivos:
-					print(a)
+				actual=self.comprobar(abierta.pop(0))
+
+			except IndexError:
+
+				print(actual.estante[0].p0)
+				print(actual.estante[1].p0)
+
+			tmp = []
+
+			if actual.estante[0].destino() and actual.estante[1].destino():
+				
 				exito=True
-
-			if actual.pos==[pos_entrega[0][0],pos_entrega[0][1],0,True]: #or actual.pos==[pos_entrega[1][0],pos_entrega[1][1],0,True] or actual.pos==[pos_entrega[2][0],pos_entrega[2][1],0,True]:
-				actual.mapa[actual.pos[0]][actual.pos[1]]=4
 
 			else:
 
-				self.mover(actual)
-				self.girar_izquierda(actual)
-				self.girar_derecha(actual)
+				for i in range(len(actual.estante)):
+
+					tmp.append(Estanteria(actual.estante[i].p0,actual.estante[i].pf))
+
+				if actual.pos == [3,7,0,True] or actual.pos == [3,9,0,True]:
+
+					print('Actual:',actual.pos)
+
+				self.elevador_subir(actual,copy.deepcopy(tmp))
+				self.elevador_bajar(actual,copy.deepcopy(tmp))
+				self.mover(actual,copy.deepcopy(tmp))
+				self.girar_izquierda(actual,copy.deepcopy(tmp))
+				self.girar_derecha(actual,copy.deepcopy(tmp))
+
 				cerrada.append(actual)
 
-				#input('Pruebas')
-		
+				#input('')
+
 		print("Terminamos pibe")
-		print(actual.g)
+		plan=[]
+		#lista=[]
 
-	def mover(self,actual):
+		while actual.pai!=None:
+			
+			#lista.append(actual.estante[0].p0)
+			plan.append(actual.pos)
+			actual=actual.pai
+   
+		plan=plan[::-1]
+		#lista=lista[::-1]
+  
+		print(plan)
+		#print(lista)
+  
+	def elevador_subir(self,actual,tmp):
+     
+		pos_temp=copy.deepcopy(actual.pos)
+		nuevo_mapa=copy.deepcopy(actual.mapa)
 
-		pos_temp=actual.pos.copy()
-		nuevo_mapa=actual.mapa.copy()
+		###EXPERIMENTAL###
+
+		bucle = []
+
+		for element in tmp:
+
+			if not element.destino():
+
+				bucle.append(abs((element.pf[0]-pos_temp[0]))+abs((element.pf[1]-pos_temp[1])))
+
+			else:
+
+				bucle.append(sys.maxsize)
+
+		est_cerca = tmp[bucle.index(min(bucle))]
+
+		###
+
+		if pos_temp[0]==est_cerca.p0[0] and pos_temp[1]==est_cerca.p0[1] and not est_cerca.destino() and not actual.pos[3]:
+			pos_temp[3]=True
+
+			actual.addNodo(nuevo_mapa,pos_temp,3,tmp)
+
+	def elevador_bajar(self,actual,tmp):
+
+		pos_temp=copy.deepcopy(actual.pos)
+		nuevo_mapa=copy.deepcopy(actual.mapa)
+
+		if pos_temp[3]:
+
+			pos_temp[3]=False
+			actual.addNodo(nuevo_mapa,pos_temp,3,tmp)
+
+	def mover(self,actual,tmp):
+
+		pos_temp=copy.deepcopy(actual.pos)
+		nuevo_mapa=copy.deepcopy(actual.mapa)
+
+		###EXPERIMENTAL###
+
+		bucle = []
+
+		for element in tmp:
+
+			if not element.destino():
+
+				bucle.append(abs((element.pf[0]-pos_temp[0]))+abs((element.pf[1]-pos_temp[1])))
+
+			else:
+
+				bucle.append(sys.maxsize)
+
+		est_cerca = tmp[bucle.index(min(bucle))]
+
+		###
 
 		if pos_temp[2]==0:
 
@@ -151,17 +266,31 @@ class Nodo(object):
 
 			if actual.pos[3]:
 
-				#print("Posicion actual: {}".format(actual.pos))
-				nuevo_mapa[pos_temp[0]][pos_temp[1]]=2
-				nuevo_mapa[actual.pos[0]][actual.pos[1]]=2
+				est_cerca.actualizar_pos([pos_temp[0],pos_temp[1],est_cerca.p0[2]])
+			
+			actual.addNodo(nuevo_mapa,pos_temp,1,tmp)
 
-			#print("Posicion actual: {}".format(pos_temp))
+	def girar_izquierda(self,actual,tmp):
 
-			actual.addNodo(nuevo_mapa,pos_temp,1)
+		pos_temp=copy.deepcopy(actual.pos)
 
-	def girar_izquierda(self,actual):
+		###EXPERIMENTAL###
 
-		pos_temp=actual.pos.copy()
+		bucle = []
+
+		for element in tmp:
+
+			if not element.destino():
+
+				bucle.append(abs((element.pf[0]-pos_temp[0]))+abs((element.pf[1]-pos_temp[1])))
+
+			else:
+
+				bucle.append(sys.maxsize)
+
+		est_cerca = tmp[bucle.index(min(bucle))]
+
+		###
 
 		if pos_temp[2]==0:
 
@@ -179,13 +308,42 @@ class Nodo(object):
 
 			pos_temp[2]=0
 
-		#print("Posicion actual: {}".format(pos_temp))
+		z=2
 
-		actual.addNodo(mapa_objetivos,pos_temp,3)
+		if pos_temp[3]:
 
-	def girar_derecha(self,actual):
+			giro = tmp[0].p0[2]
+			giro-=1
+			if giro<-2:
+				giro=1
 
-		pos_temp=actual.pos.copy()
+			z+=1
+
+			est_cerca.actualizar_pos([pos_temp[0],pos_temp[1],giro])
+
+		actual.addNodo(mapa_objetivos,pos_temp,z,tmp)
+
+	def girar_derecha(self,actual,tmp):
+
+		pos_temp=copy.deepcopy(actual.pos)
+
+		###EXPERIMENTAL###
+
+		bucle = []
+
+		for element in tmp:
+
+			if not element.destino():
+
+				bucle.append(abs((element.pf[0]-pos_temp[0]))+abs((element.pf[1]-pos_temp[1])))
+
+			else:
+
+				bucle.append(sys.maxsize)
+
+		est_cerca = tmp[bucle.index(min(bucle))]
+
+		###
 
 		if pos_temp[2]==0:
 
@@ -203,14 +361,24 @@ class Nodo(object):
 
 			pos_temp[2]=0
 
-		#print("Posicion actual: {}".format(pos_temp))
+		z=2
 
-		actual.addNodo(mapa_objetivos,pos_temp,3)
+		if pos_temp[3]:
 
-root=Nodo(None,mapa_objetivos,[8,4,0,False])
+			giro = tmp[0].p0[2]
+			giro+=1
+			if giro>1:
+				giro=-2
+
+			z+=1
+
+			est_cerca.actualizar_pos([pos_temp[0],pos_temp[1],giro])
+
+		actual.addNodo(mapa_objetivos,pos_temp,z,tmp)
+
+root=Nodo(None,mapa_objetivos,[8,4,0,False],[Estanteria([8,3,0],[3,7,0]),Estanteria([8,12,0],[3,9,0])]) #Estanteria([5,2,0],[3,4,0])
 
 cerrada=[]
 abierta=[root]
 
 root.run()
-
