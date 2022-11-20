@@ -4,7 +4,7 @@ from math import sin,cos,pi
 
 #clase estantería, con atributos de posiciones iniciales y finales
 
-mapa_objetivos=[[0,0,0,0,0,0,0,0,0],
+'''mapa_objetivos=[[0,0,0,0,0,0,0,0,0],
 				[0,0,1,1,1,1,0,0,0],
 				[0,0,1,1,1,1,0,0,0],
 				[0,0,0,0,1,1,0,0,0],
@@ -13,23 +13,23 @@ mapa_objetivos=[[0,0,0,0,0,0,0,0,0],
 				[0,1,1,1,0,0,0,0,0],
 				[0,0,0,1,1,1,0,0,0],
 				[0,0,0,1,1,1,0,0,0],
-				[0,0,0,0,0,0,0,0,0]]
-'''
+				[0,0,0,0,0,0,0,0,0]]'''
+
 mapa_objetivos=[[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
 				[0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
-				[0,0,0,0,0,0,1,1,3,1,1,0,0,0,0,0,0],
-				[0,0,0,0,0,0,1,3,1,3,1,0,0,0,0,0,0],
+				[0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
+				[0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
 				[0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0],
 				[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
 				[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
 				[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-				[0,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,0],
 				[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
-				[0,1,1,2,1,1,1,1,1,1,1,1,1,2,1,1,0],
+				[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
+				[0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0],
 				[0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],
 				[0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],
 				[0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0],
-				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]'''
+				[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]]
 				
 class Estanteria():
 
@@ -132,13 +132,16 @@ class Nodo():
 
 			tmp = [Estanteria(actual.estante[0].p0,actual.estante[0].pf)]
 
-			if tmp[0].destino():
-				
+
+			#al tener varias estanterías trabajamos con una lista de las mismas, cada vez que una de ellas llega al destino la eliminamos de la lista para trabajar con la siguiente
+			if len(estanterias)==0:
 				exito=True
 
-			else:
+			if tmp[0].destino():
 
-				#print('Actual:',actual.pos)
+				estanterias.pop(0)
+
+			else:
 
 				self.elevador_subir(actual,[Estanteria(actual.estante[0].p0,actual.estante[0].pf)])
 				self.elevador_bajar(actual,[Estanteria(actual.estante[0].p0,actual.estante[0].pf)])
@@ -148,23 +151,17 @@ class Nodo():
 
 				cerrada.append(actual)
 
-				#input('')
-
 		print("Terminamos pibe")
-		plan=[]
-		#lista=[]
 
+		plan=[]
 		while actual.pai!=None:
-			
-			#lista.append(actual.estante[0].p0)
+
 			plan.append(actual.pos)
 			actual=actual.pai
-   
+	
 		plan=plan[::-1]
-		#lista=lista[::-1]
   
 		print(plan)
-		#print(lista)
   
 	def elevador_subir(self,actual,tmp):
      
@@ -277,7 +274,8 @@ class Nodo():
 
 		actual.addNodo(mapa_objetivos,pos_temp,3,tmp)
 
-root=Nodo(None,mapa_objetivos,[8,4,0,False],[Estanteria([5,2,0],[3,4,0])])
+estanterias=[Estanteria([8,3,0],[2,8,0]),Estanteria([9,3,0],[3,7,0]),Estanteria([10,13,0],[3,9,0])]
+root=Nodo(None,mapa_objetivos,[12,8,0,False],estanterias)
 
 cerrada=[]
 abierta=[root]
