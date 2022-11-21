@@ -122,7 +122,7 @@ class Nodo():
 
 		for nodo in cerrada:
 
-			if nodo.pos==actual.pos:
+			if nodo.pos==actual.pos and nodo.estante[0].p0 == actual.estante[0].p0 and nodo.estante[1].p0 == actual.estante[1].p0:
 
 				actual=self.comprobar(abierta.pop(0))
 			
