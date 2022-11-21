@@ -134,14 +134,7 @@ class Nodo():
 
 		while not exito and len(abierta)!=0:
 
-			try:
-
-				actual=self.comprobar(abierta.pop(0))
-
-			except IndexError:
-
-				print(actual.estante[0].p0)
-				print(actual.estante[1].p0)
+			actual=self.comprobar(abierta.pop(0))
 
 			tmp = []
 
