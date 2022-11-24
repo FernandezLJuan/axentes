@@ -1,11 +1,23 @@
 
 from math import sin,cos,pi
 import copy
+import time
 
 global cerrada
 global abierta
 
+global pos_init
+
 #clase estantería, con atributos de posiciones iniciales y finales
+'''
+mapa_objetivos = [[0,0,0,0,0],
+				  [0,1,1,1,0],
+				  [0,1,1,1,0],
+				  [0,1,1,1,0],
+				  [0,1,1,1,0],
+				  [0,1,1,1,0],
+				  [0,0,0,0,0],]'''
+
 
 mapa_objetivos=[[0,0,0,0,0,0,0,0,0],
 				[0,0,1,1,1,1,0,0,0],
@@ -75,6 +87,10 @@ class Estanteria():
 
 		return self.p0==self.pf
 
+	def print(self):
+
+		print(self.p0)
+
 class Nodo():
 	
 	def __init__(self,pai,mapa,pos,estante):
@@ -94,10 +110,12 @@ class Nodo():
 
 		distancia=[]
 		for p in estante:
-			distancia.append(abs((p.pf[0]-novo_nodo.pos[0]))+abs((p.pf[1]-novo_nodo.pos[1])))
+			distancia.append(abs((p.pf[0]-p.p0[0]))+abs((p.pf[1]-p.p0[1])))
+
+		euclideo = sum(distancia) + (abs((pos_init[0]-novo_nodo.pos[0]))+abs((pos_init[1]-novo_nodo.pos[1])))
 
 		novo_nodo.g=novo_nodo.pai.g+g
-		novo_nodo.f=novo_nodo.g+min(distancia)
+		novo_nodo.f=novo_nodo.g+euclideo
 
 		if abierta == []:
 
@@ -122,7 +140,7 @@ class Nodo():
 
 		for nodo in cerrada:
 
-			if nodo.pos==actual.pos and nodo.estante[0].p0 == actual.estante[0].p0:
+			if nodo.pos==actual.pos and nodo.estante[0].p0 == actual.estante[0].p0: #and nodo.estante[1].p0 == actual.estante[1].p0:
 
 				actual=self.comprobar(abierta.pop(0))
 			
@@ -136,7 +154,7 @@ class Nodo():
 
 			#print('Pos estanterias:',element.p0)
 
-			if actual.pos[:2] == element.p0[:2]:
+			if actual.pos[:2] == element.p0[:2] and not element.destino():
 
 				return est.index(element)
 
@@ -152,13 +170,19 @@ class Nodo():
 
 			tmp = copy.deepcopy(actual.estante)
 
-			if tmp[0].destino() and actual.pos == [8,4,0,False]: # and tmp[1].destino()
+			if tmp[0].destino():
+
+				print('Actual:',actual.pos)
+				print(tmp[0].p0)
+				#print(tmp[1].p0)
+
+			if tmp[0].destino() and actual.pos == pos_init: #and tmp[1].destino()
 
 				exito = True
 
 			else:
 
-				est = tmp[self.cercania(actual,tmp)]
+				est = self.cercania(actual,tmp)
 
 				self.elevador_subir(actual,copy.deepcopy(tmp),est)
 				self.elevador_bajar(actual,copy.deepcopy(tmp),est)
@@ -187,7 +211,7 @@ class Nodo():
 		pos_temp=actual.pos.copy()
 		nuevo_mapa=actual.mapa.copy()
 
-		if actual.pos[:2] == est.p0[:2] and not est.destino() and not actual.pos[3]:
+		if actual.pos[:2] == tmp[est].p0[:2] and not tmp[est].destino() and not actual.pos[3]:
 			
 			pos_temp[3]=True
 			actual.addNodo(nuevo_mapa,pos_temp,1,tmp)
@@ -226,9 +250,9 @@ class Nodo():
 
 		if mapa_objetivos[pos_temp[0]][pos_temp[1]]!=0:
 
-			if actual.pos[3] and not est.destino():
+			if actual.pos[3] and est!=-1:
 
-				valor = est.actualizar_pos([pos_temp[0],pos_temp[1],est.p0[2]])
+				valor = tmp[est].actualizar_pos([pos_temp[0],pos_temp[1],tmp[est].p0[2]])
 			
 			if valor:
 
@@ -255,14 +279,14 @@ class Nodo():
 
 			pos_temp[2]=0
 
-		if pos_temp[3]:
+		if pos_temp[3] and est!=-1:
 
-			giro = est.p0[2]
+			giro = tmp[est].p0[2]
 			giro-=1
 			if giro<-2:
 				giro=1
 
-			valor = est.actualizar_pos([pos_temp[0],pos_temp[1],giro])
+			valor = tmp[est].actualizar_pos([tmp[est].p0[0],tmp[est].p0[1],giro])
 
 		if valor:
 
@@ -289,23 +313,29 @@ class Nodo():
 
 			pos_temp[2]=0
 
-		if pos_temp[3]:
+		if pos_temp[3] and est!=-1:
 
-			giro = est.p0[2]
+			giro = tmp[est].p0[2]
 			giro+=1
 			if giro>1:
 				giro=-2
 
-			valor = est.actualizar_pos([pos_temp[0],pos_temp[1],giro])
+			valor = tmp[est].actualizar_pos([tmp[est].p0[0],tmp[est].p0[1],giro])
 
 		if valor:
 
 			actual.addNodo(mapa_objetivos,pos_temp,3,tmp)
 
-estanterias = [Estanteria([5,2,0],[2,4,0])] #,Estanteria([5,6,0],[2,5,0])
+start = time.time()
+
+pos_init = [8,4,0,False]
+
+estanterias =  [Estanteria([5,2,0],[2,4,0])] #Estanteria([2,1,0],[4,1,0]) #[Estanteria([8,3,0],[3,7,0]),Estanteria([9,13,0],[3,9,0])]
 root=Nodo(None,mapa_objetivos,[8,4,0,False],estanterias)
 
 cerrada=[]
 abierta=[root]
 
 root.run()
+
+print(time.time() - start)
