@@ -9,7 +9,6 @@ global pos_init
 
 #clase estantería, con atributos de posiciones iniciales y finales
 
-
 mapa_objetivos = [[0,0,0,0,0],
 				  [0,1,1,1,0],
 				  [0,1,1,1,0],
@@ -172,7 +171,12 @@ class Nodo():
 
 	def run(self):
 
+		g = open('plan.txt','w')
+		f = open('stadistics.txt','w')
+
 		exito=False
+
+		start = time.time()
 
 		while not exito and len(abierta)!=0:
 
@@ -212,6 +216,10 @@ class Nodo():
 
 				#input()
 
+		f.write('Tiempo de ejecucion: {0}\n'.format(time.time() - start))
+		f.write('Coste total: {0}\n'.format(actual.g))
+		f.write('Nodos expandidos: {0}\n'.format(len(cerrada)+1))
+
 		print("Terminamos pibe")
 
 		plan=[]
@@ -222,7 +230,9 @@ class Nodo():
 	
 		plan=plan[::-1]
   
-		print(plan)
+		#print(plan)
+		g.write(str(plan))
+		f.write('Longitud del plan: {0}\n'.format(len(plan)))
   
 	def elevador_subir(self,actual,tmp,est):
      
@@ -356,17 +366,20 @@ class Nodo():
 
 			actual.addNodo(mapa_objetivos,pos_temp,z,tmp)
 
-start = time.time()
+if __name__ == "__main__":
 
-pos_init = [1,2,0,False]
+	#Posicion inicial del robot
+	
+	pos_init = [1,2,0,False] #Posicion inicial para el primer mapa
+	#pos_init = [8,4,0,False] #Posicion inicial para los dos siguientes
 
-estanterias = [Estanteria([2,3,0],[4,3,0]),Estanteria([2,1,0],[4,1,0])] #[Estanteria([8,3,0],[3,7,0]),Estanteria([9,13,0],[3,9,0])] #[Estanteria([2,3,0],[4,3,0]),Estanteria([2,1,0],[4,1,0])]
+	estanterias = [Estanteria([2,3,0],[4,3,0]),Estanteria([2,1,0],[4,1,0])] #Estanterias para el primer mapa
+	#estanterias = [Estanteria([5,2,0],[2,4,0])] #Estanterias para el segundo mapa
+	#estanterias = [Estanteria([8,3,0],[3,7,0]),Estanteria([9,13,0],[3,9,0])] #Estanterias para el tercer mapa
 
-root=Nodo(None,mapa_objetivos,pos_init,estanterias)
+	root=Nodo(None,mapa_objetivos,pos_init,estanterias)
 
-cerrada=[]
-abierta=[root]
+	cerrada=[]
+	abierta=[root]
 
-root.run()
-
-print(time.time() - start)
+	root.run()
