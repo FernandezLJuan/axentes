@@ -368,18 +368,21 @@ class Nodo():
 
 if __name__ == "__main__":
 
-	#Posicion inicial del robot
+	#Posicion inicial del robot(descomentar para probar)
 	
 	pos_init = [1,2,0,False] #Posicion inicial para el primer mapa
 	#pos_init = [8,4,0,False] #Posicion inicial para los dos siguientes
 
-	estanterias = [Estanteria([2,3,0],[4,3,0]),Estanteria([2,1,0],[4,1,0])] #Estanterias para el primer mapa
+	#Estanterias con las que trabaja(descomentar para probar)
+
+	estanterias = [Estanteria([2,3,0],[4,3,0])] #Estanteria para el primer mapa
+	#estanterias = [Estanteria([2,3,0],[4,3,0]),Estanteria([2,1,0],[4,1,0])] #Estanterias para el primer mapa
 	#estanterias = [Estanteria([5,2,0],[2,4,0])] #Estanterias para el segundo mapa
 	#estanterias = [Estanteria([8,3,0],[3,7,0]),Estanteria([9,13,0],[3,9,0])] #Estanterias para el tercer mapa
 
-	root=Nodo(None,mapa_objetivos,pos_init,estanterias)
+	root=Nodo(None,mapa_objetivos,pos_init,estanterias) #Nodo inicial
 
-	cerrada=[]
-	abierta=[root]
+	cerrada=[] #Lista de cerrada de A*
+	abierta=[root] #Lista de abierta de A*
 
-	root.run()
+	root.run() #Ejecucion del algoritmo A*
