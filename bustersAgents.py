@@ -208,7 +208,7 @@ class BasicAgentAA(BustersAgent):
 
     def printLineData(self,gameState):
 
-        lista = [gameState.getScore(), gameState.getNumAgents() - 1, gameState.getLivingGhosts(), gameState.getPacmanPosition(), gameState.getGhostPositions(), gameState.getLegalPacmanActions(), gameState.getNumFood()]
+        lista = [gameState.getScore(), gameState.getNumAgents() - 1, gameState.getLivingGhosts(), gameState.getPacmanPosition(), gameState.getGhostPositions(), gameState.data.ghostDistances, gameState.getLegalPacmanActions(), gameState.getNumFood()]
         return(str(lista)+"\n")
 
     def registerInitialState(self, gameState):
