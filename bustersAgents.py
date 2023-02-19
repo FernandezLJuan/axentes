@@ -208,7 +208,7 @@ class BasicAgentAA(BustersAgent):
 
     def printLineData(self,gameState):
 
-        lista = [gameState.getScore(), gameState.getNumAgents() - 1, gameState.getLivingGhosts(), gameState.getGhostPositions(), gameState.data.ghostDistances, gameState.getLegalPacmanActions()]
+        lista = [gameState.getScore(), gameState.getNumAgents() - 1, gameState.getLivingGhosts(), gameState.getPacmanPosition(), gameState.getGhostPositions(), gameState.data.ghostDistances, gameState.getLegalPacmanActions()]
         return(str(lista)+"\n")
 
     def registerInitialState(self, gameState):
@@ -298,14 +298,10 @@ class BasicAgentAA(BustersAgent):
 
         distancia = [nearest_pos[0] - gameState.getPacmanPosition()[0],nearest_pos[1] - gameState.getPacmanPosition()[1]]
         print(distancia)
-
-        move = None
         
-        try:
-            if   (distancia[1] > 0) and Directions.NORTH in legal:   move = Directions.NORTH
-            elif   (distancia[1] < 0) and Directions.SOUTH in legal: move = Directions.SOUTH
-            elif   (distancia[0] < 0) and Directions.WEST in legal:  move = Directions.WEST
-            elif   (distancia[0] > 0) and Directions.EAST in legal: move = Directions.EAST
-        else: move = Directions.STOP
+        if   (distancia[1] > 0) and Directions.NORTH in legal:   move = Directions.NORTH
+        elif   (distancia[1] < 0) and Directions.SOUTH in legal: move = Directions.SOUTH
+        elif   (distancia[0] < 0) and Directions.WEST in legal:  move = Directions.WEST
+        elif   (distancia[0] > 0) and Directions.EAST in legal: move = Directions.EAST
 
         return move
