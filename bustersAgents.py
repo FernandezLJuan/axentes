@@ -121,6 +121,7 @@ from distanceCalculator import Distancer
 from game import Actions
 from game import Directions
 import random, sys
+import os
 
 '''Random PacMan Agent'''
 class RandomPAgent(BustersAgent):
@@ -237,12 +238,6 @@ class BasicAgentAA(BustersAgent):
 
     def printInfo(self, gameState):
 
-        f = open("data.txt","a")
-
-        f.write(self.printLineData(gameState))
-
-        f.close()
-
         print "---------------- TICK ", self.countActions, " --------------------------"
         # Dimensiones del mapa
         width, height = gameState.data.layout.width, gameState.data.layout.height
@@ -282,27 +277,35 @@ class BasicAgentAA(BustersAgent):
         nearest_pos = None
 
         tmp = copy.deepcopy(gameState.data.ghostDistances)
-        tmp.sort()
-        number = tmp.pop(0)
+        number = min(tmp)
+
+        print(tmp)
 
         while nearest_pos == None:
 
+            while number == None or number == 0:
+
+                tmp.pop(tmp.index(None))
+                number = min(tmp)
+
+                print('Hise pop')
+                print(tmp)
+                print(number)
+
             nearest = gameState.data.ghostDistances.index(number)
 
-            if gameState.getLivingGhosts()[nearest]:
-                nearest_pos = gameState.getGhostPositions()[nearest]
-
-            else:
-                number = tmp.pop(0)
+            nearest_pos = gameState.getGhostPositions()[nearest]
 
         distancia = [nearest_pos[0] - gameState.getPacmanPosition()[0],nearest_pos[1] - gameState.getPacmanPosition()[1]]
         print(distancia)
 
         move = None
         
-        if   (distancia[0] < 0) and Directions.WEST in legal and move == None:  move = Directions.WEST
-        elif   (distancia[0] > 0) and Directions.EAST in legal and move == None: move = Directions.EAST
-        elif   (distancia[1] > 0) and Directions.NORTH in legal and move == None:   move = Directions.NORTH
-        elif   (distancia[1] > 0) and Directions.SOUTH in legal and move == None: move = Directions.SOUTH
+        try:
+            if   (distancia[1] > 0) and Directions.NORTH in legal:   move = Directions.NORTH
+            elif   (distancia[1] < 0) and Directions.SOUTH in legal: move = Directions.SOUTH
+            elif   (distancia[0] < 0) and Directions.WEST in legal:  move = Directions.WEST
+            elif   (distancia[0] > 0) and Directions.EAST in legal: move = Directions.EAST
+        else: move = Directions.STOP
 
         return move
