@@ -269,37 +269,37 @@ class BasicAgentAA(BustersAgent):
           
     def chooseAction(self, gameState):
 
-        self.countActions = self.countActions + 1
-        self.printInfo(gameState)
-        move = Directions.STOP
+        self.countActions = self.countActions + 1 #Numero de acciones ejecutadas
+        self.printInfo(gameState) #Imprime toda la información del tick
+        move = Directions.STOP #Inicializa el movimiento
         legal = gameState.getLegalActions(0) ##Legal position from the pacman
 
-        nearest_pos = None
+        nearest_pos = None #Posicion hacia la que se va a mover(posición del fantasma vivo mas cercano)
 
-        tmp = copy.deepcopy(gameState.data.ghostDistances)
-        number = min(tmp)
+        tmp = copy.deepcopy(gameState.data.ghostDistances) #Copia de las distancias a los fantasmas para modificar
+        number = min(tmp) #Busca el minimo de las distancias
 
         print(tmp)
 
-        while nearest_pos == None:
+        while nearest_pos == None: #Mientras no tengamos objetivo
 
-            while number == None or number == 0:
+            while number == None or number == 0: #Si el valor mas pequeño de las distancias es nulo(fantasma mas cercano esta muerto)
 
-                tmp.pop(tmp.index(None))
-                number = min(tmp)
+                tmp.pop(tmp.index(None)) #Quita esa posicion de la lista
+                number = min(tmp) #Y vuelve a buscar un minimo en la nueva lista
 
-                print('Hise pop')
+                print('Hise pop') #Prints de comprobación
                 print(tmp)
                 print(number)
 
-            nearest = gameState.data.ghostDistances.index(number)
+            nearest = gameState.data.ghostDistances.index(number) #Busca esa distancia en el vector original de distancias para saber que fantasma es
 
-            nearest_pos = gameState.getGhostPositions()[nearest]
+            nearest_pos = gameState.getGhostPositions()[nearest] #Y sabiendo cual es, saca su posición
 
-        distancia = [nearest_pos[0] - gameState.getPacmanPosition()[0],nearest_pos[1] - gameState.getPacmanPosition()[1]]
+        distancia = [nearest_pos[0] - gameState.getPacmanPosition()[0],nearest_pos[1] - gameState.getPacmanPosition()[1]] #Calcula la distancia de Manhattan al fantasma
         print(distancia)
         
-        if   (distancia[1] > 0) and Directions.NORTH in legal:   move = Directions.NORTH
+        if   (distancia[1] > 0) and Directions.NORTH in legal:   move = Directions.NORTH #Hace el movimiento basico en la dirección marcada
         elif   (distancia[1] < 0) and Directions.SOUTH in legal: move = Directions.SOUTH
         elif   (distancia[0] < 0) and Directions.WEST in legal:  move = Directions.WEST
         elif   (distancia[0] > 0) and Directions.EAST in legal: move = Directions.EAST
