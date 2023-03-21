@@ -726,7 +726,9 @@ class Game:
             if _BOINC_ENABLED:
                 boinc.set_fraction_done(self.getProgress())
 
-        f.write("\n\n")
+            if 'printLineData' in dir(agent): #como pacman es el unico que tiene la funcion printLineData, solo imprime la accion escogida para ese agente
+                f.write(str(action)+'\n')
+
         f.close()
 
         # inform a learning agent of the game result

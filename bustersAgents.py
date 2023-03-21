@@ -12,6 +12,7 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
+
 import util
 from game import Agent
 from game import Directions
@@ -208,8 +209,32 @@ class BasicAgentAA(BustersAgent):
 
     def printLineData(self,gameState):
 
-        lista = [gameState.getScore(), gameState.getNumAgents() - 1, gameState.getLivingGhosts(), gameState.getPacmanPosition(), gameState.getGhostPositions(), gameState.data.ghostDistances, gameState.getLegalPacmanActions(), gameState.getNumFood()]
-        return(str(lista)+"\n")
+        lista = [gameState.getLivingGhosts(), gameState.data.ghostDistances, gameState.getNumFood()]
+
+        tmp = gameState.getPacmanPosition()
+
+        cadena = '' + str(tmp[0]) + ',' + str(tmp[1]) + ','
+
+        for elemento in lista:
+
+            if isinstance(elemento,list):
+
+                for array in elemento:
+
+                    if isinstance(array, tuple):
+
+                        cadena+=str(array[0])+','
+                        cadena+=str(array[1])+','
+
+                    else:
+
+                        cadena += str(array) + ','
+
+            else:
+
+                cadena += str(elemento) + ','
+
+        return(cadena)
 
     def registerInitialState(self, gameState):
         BustersAgent.registerInitialState(self, gameState)
@@ -270,36 +295,36 @@ class BasicAgentAA(BustersAgent):
     def chooseAction(self, gameState):
 
         self.countActions = self.countActions + 1 #Numero de acciones ejecutadas
-        self.printInfo(gameState) #Imprime toda la información del tick
+        self.printInfo(gameState) #Imprime toda la informacion del tick
         move = Directions.STOP #Inicializa el movimiento
         legal = gameState.getLegalActions(0) ##Legal position from the pacman
 
-        nearest_pos = None #Posicion hacia la que se va a mover(posición del fantasma vivo mas cercano)
+        nearest_pos = None
 
-        tmp = copy.deepcopy(gameState.data.ghostDistances) #Copia de las distancias a los fantasmas para modificar
-        number = min(tmp) #Busca el minimo de las distancias
+        tmp = copy.deepcopy(gameState.data.ghostDistances) 
+        number = min(tmp)
 
         print(tmp)
 
-        while nearest_pos == None: #Mientras no tengamos objetivo
+        while nearest_pos == None:
 
-            while number == None or number == 0: #Si el valor mas pequeño de las distancias es nulo(fantasma mas cercano esta muerto)
+            while number == None or number == 0:
 
-                tmp.pop(tmp.index(None)) #Quita esa posicion de la lista
-                number = min(tmp) #Y vuelve a buscar un minimo en la nueva lista
+                tmp.pop(tmp.index(None))
+                number = min(tmp)
 
-                print('Hise pop') #Prints de comprobación
+                print('Hise pop')
                 print(tmp)
                 print(number)
 
-            nearest = gameState.data.ghostDistances.index(number) #Busca esa distancia en el vector original de distancias para saber que fantasma es
+            nearest = gameState.data.ghostDistances.index(number)
 
-            nearest_pos = gameState.getGhostPositions()[nearest] #Y sabiendo cual es, saca su posición
+            nearest_pos = gameState.getGhostPositions()[nearest] 
 
-        distancia = [nearest_pos[0] - gameState.getPacmanPosition()[0],nearest_pos[1] - gameState.getPacmanPosition()[1]] #Calcula la distancia de Manhattan al fantasma
+        distancia = [nearest_pos[0] - gameState.getPacmanPosition()[0],nearest_pos[1] - gameState.getPacmanPosition()[1]] 
         print(distancia)
         
-        if   (distancia[1] > 0) and Directions.NORTH in legal:   move = Directions.NORTH #Hace el movimiento basico en la dirección marcada
+        if   (distancia[1] > 0) and Directions.NORTH in legal:   move = Directions.NORTH 
         elif   (distancia[1] < 0) and Directions.SOUTH in legal: move = Directions.SOUTH
         elif   (distancia[0] < 0) and Directions.WEST in legal:  move = Directions.WEST
         elif   (distancia[0] > 0) and Directions.EAST in legal: move = Directions.EAST
